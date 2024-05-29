@@ -2,6 +2,7 @@
 
 namespace Job;
 
+use SilverStripe\Control\Controller;
 use SilverStripe\Dev\Debug;
 use SilverStripe\Assets\File;
 use SilverStripe\ORM\DataObject;
@@ -45,7 +46,7 @@ class Job extends DataObject
 
     public function Link($action_ = null)
     {
-        return $this->JobsPage()->Link() . "job/" . $this->URLSegment;
+        return Controller::join_links($this->JobsPage()->Link(), "job", $this->URLSegment);
     }
 
     public function onBeforeWrite()
