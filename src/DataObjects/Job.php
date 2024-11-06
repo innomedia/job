@@ -61,25 +61,48 @@ class Job extends DataObject
 
     private function constructURLSegment()
     {
-        return $this->cleanLink(strtolower(str_replace(" ", "-", $this->Title)));
+        $link = $this->cleanLink(strtolower($this->Title));
+        $count = 0;
+
+        // Stelle sicher, dass der Link eindeutig ist
+        while(Job::get()->filter('URLSegment', $link . ($count > 0 ? "-$count" : ''))->exists()) {
+            $count++;
+        }
+
+        return $link . ($count > 0 ? "-$count" : '');
     }
 
     private function cleanLink($string)
     {
-        $string = str_replace("ä", "ae", $string);
-        $string = str_replace("ü", "ue", $string);
-        $string = str_replace("ö", "oe", $string);
-        $string = str_replace("Ä", "Ae", $string);
-        $string = str_replace("Ü", "Ue", $string);
-        $string = str_replace("Ö", "Oe", $string);
-        $string = str_replace("ß", "ss", $string);
-        $string = str_replace(["´", ",", ":", ";"], "", $string);
-        $string = str_replace(["´", ",", ":", ";"], "", $string);
-        $string = str_replace(["/", "(", ")"], "_", $string);
-        $string = preg_replace('/[^A-Za-z0-9\-]/', '', $string);
+        // Entferne führende und nachfolgende Leerzeichen
+        $string = trim($string);
+
+        $replacements = [
+            " " => "-", "ä" => "ae", "ü" => "ue", "ö" => "oe",
+            "Ä" => "Ae", "Ü" => "Ue", "Ö" => "Oe", "ß" => "ss",
+            "´" => "", "," => "", ":" => "", ";" => "",
+            "/" => "", "(" => "", ")" => ""
+        ];
+
+        // Entferne typische Geschlechtskennzeichnungen wie (m/w/d)
+        $string = preg_replace('/\b(m\/w\/d|m\/w|w\/m|d|f|div)\b/i', '', $string);
+
+        // Ersetze alle definierten Zeichen
+        $string = strtr($string, $replacements);
+
+        // Entferne alle unzulässigen Zeichen
+        $string = preg_replace('/[^A-Za-z0-9\-_]/', '', $string);
+
+        // Entferne abschließende Bindestriche
+        $string = rtrim($string, '-');
+
+        // Ersetze doppelte Bindestriche oder Unterstriche durch einen einzigen
+        $string = preg_replace('/-{2,}/', '-', $string);
+        $string = preg_replace('/_{2,}/', '_', $string);
+
         return $string;
     }
-
+    
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();
