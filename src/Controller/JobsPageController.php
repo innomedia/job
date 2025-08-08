@@ -46,6 +46,7 @@ class JobsPageController extends PageController
                 "Job" => $job->First(),
                 'BackLink' => (($this->request->getHeader('Referer')) ? $this->request->getHeader('Referer') : $this->Link()),
             ];
+            $this->extend('updateJobTemplateData', $job, $templateData);
             return $this->customise(new ArrayData($templateData))->renderWith(["Job","Page"]);
         } else {
             return false;
