@@ -3,47 +3,45 @@
 namespace Job\DataObjects;
 
 use Job\JobsPage;
-use SilverStripe\Assets\Image;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Forms\TextField;
-use Reference\Pages\ReferencePage;
-use Reference\DataObjects\ReferenceCategory;
 use SilverStripe\FontAwesome\FontAwesomeField;
 
 class JobCircle extends DataObject
 {
-    private static $tablename = "JobCircle";
-    private static $singular_name = 'JobCircle';
+    private static string $tablename = "JobCircle";
+    
+    private static string $singular_name = 'JobCircle';
 
-    private static $summary_fields = [
+    private static array $summary_fields = [
         "Hauptinfo" =>  "Hauptinfo",
         "Icon" =>  "Icon",
         "Zusatzinfo" =>  "Zusatzinfo",
     ];
 
-    private static $db = [
+    private static array $db = [
         'Hauptinfo' => 'Text',
         'Zusatzinfo' => 'Text',
         'Icon' => 'Varchar',
     ];
 
 
-    private static $has_one = [
+    private static array $has_one = [
         'JobsPage' => JobsPage::class,
     ];
 
-    public function onBeforeWrite()
+    public function onBeforeWrite(): void
     {
         parent::onBeforeWrite();
         $this->URLSegment = $this->constructURLSegment();
     }
 
-    private function constructURLSegment()
+    private function constructURLSegment(): string|array
     {
         return $this->cleanLink(strtolower(str_replace(" ", "-", $this->Title)));
     }
 
-    private function cleanLink($string)
+    private function cleanLink($string): string|array
     {
         $string = str_replace("ä", "ae", $string);
         $string = str_replace("ü", "ue", $string);
@@ -52,8 +50,7 @@ class JobCircle extends DataObject
         $string = str_replace("Ü", "Ue", $string);
         $string = str_replace("Ö", "Oe", $string);
         $string = str_replace("ß", "ss", $string);
-        $string = str_replace(["´", ",", ":", ";"], "", $string);
-        return $string;
+        return str_replace(["´", ",", ":", ";"], "", $string);
     }
 
     public function getCMSFields()

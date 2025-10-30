@@ -2,7 +2,6 @@
 
 namespace Job;
 
-use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Forms\TextField;
 use SilverStripe\AssetAdmin\Forms\UploadField;
 use SilverStripe\Forms\HTMLEditor\HtmlEditorField;
@@ -18,22 +17,25 @@ use SilverStripe\Forms\GridField\GridFieldConfig_RecordEditor;
 
 class JobsPage extends Page
 {
-    private static $table_name = 'JobsPage';
-    private static $singular_name = 'Job';
-    private static $plural_name = 'Jobs';
-    private static $description = 'Hiermit können Sie eine Jobseite erstellen - Jobs werden in dem Modul direkt gepflegt';
+    private static string $table_name = 'JobsPage';
+    
+    private static string $singular_name = 'Job';
+    
+    private static string $plural_name = 'Jobs';
+    
+    private static string $description = 'Hiermit können Sie eine Jobseite erstellen - Jobs werden in dem Modul direkt gepflegt';
 
-    private static $db = [
+    private static array $db = [
         'InitiativBewerbungsText' => 'HTMLText',
         'FragenText' => 'HTMLText',
         'BewerbungsMail' => 'Text'
     ];
 
-    private static $has_one = [
+    private static array $has_one = [
         'InitiativBewerbungsImage' => Image::class,
     ];
 
-    private static $has_many = [
+    private static array $has_many = [
         'Jobs' => Job::class,
         'JobCircle' => JobCircle::class,
         'JobCategories' => JobCategory::class,
@@ -88,7 +90,7 @@ class JobsPage extends Page
 
 
         if (Config::inst()->get("JobModuleConfig")["CirclesEnabled"] != "" && Config::inst()->get("JobModuleConfig")["CategoriesEnabled"] == true) {
-                $fields->addFieldToTab(
+            $fields->addFieldToTab(
                 'Root.JobCircle',
                 GridField::create(
                     'JobCircle',
@@ -110,6 +112,7 @@ class JobsPage extends Page
                 )
             );
         }
+        
         $this->extend('updateJobPageCMSFields', $fields);
         return $fields;
     }

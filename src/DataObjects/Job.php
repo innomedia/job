@@ -3,13 +3,11 @@
 namespace Job;
 
 use SilverStripe\Control\Controller;
-use SilverStripe\Dev\Debug;
 use SilverStripe\Assets\File;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Forms\TextField;
 use SilverStripe\TagField\TagField;
 use SilverStripe\Core\Config\Config;
-use SilverStripe\AssetAdmin\Forms\UploadField;
 use SilverStripe\Forms\HTMLEditor\HtmlEditorField;
 
 /**
@@ -20,23 +18,23 @@ use SilverStripe\Forms\HTMLEditor\HtmlEditorField;
 class Job extends DataObject
 {
 
-    private static $table_name = 'Job';
+    private static string $table_name = 'Job';
 
-    private static $db = [
+    private static array $db = [
         'Title' => 'Text',
         'TagSortTitle' => 'Text',
         'Content' => 'HTMLText',
-        'Details' =>  'HTMLText',
+        'Details' => 'HTMLText',
         'Sort' => 'Int',
         'URLSegment' => 'Varchar(255)'
     ];
 
-    private static $has_one = [
+    private static array $has_one = [
         'JobsPage' => JobsPage::class,
         'PDF' => File::class,
     ];
 
-    private static $many_many = [
+    private static array $many_many = [
         'JobCategories' => JobCategory::class,
     ];
 
@@ -49,30 +47,30 @@ class Job extends DataObject
         return Controller::join_links($this->JobsPage()->Link(), "job", $this->URLSegment);
     }
 
-    public function onBeforeWrite()
+    public function onBeforeWrite(): void
     {
         parent::onBeforeWrite();
-        if($this->URLSegment == "")
-        {
+        if ($this->URLSegment == "") {
             $this->URLSegment = $this->constructURLSegment();
         }
+        
         $this->TagSortTitle = $this->Title;
     }
 
-    private function constructURLSegment()
+    private function constructURLSegment(): string
     {
         $link = $this->cleanLink(strtolower($this->Title));
         $count = 0;
 
         // Stelle sicher, dass der Link eindeutig ist
-        while(Job::get()->filter('URLSegment', $link . ($count > 0 ? "-$count" : ''))->exists()) {
-            $count++;
+        while (Job::get()->filter('URLSegment', $link . ($count > 0 ? '-' . $count : ''))->exists()) {
+            ++$count;
         }
 
-        return $link . ($count > 0 ? "-$count" : '');
+        return $link . ($count > 0 ? '-' . $count : '');
     }
 
-    private function cleanLink($string)
+    private function cleanLink($string): ?string
     {
         // Entferne führende und nachfolgende Leerzeichen
         $string = trim($string);
@@ -98,11 +96,10 @@ class Job extends DataObject
 
         // Ersetze doppelte Bindestriche oder Unterstriche durch einen einzigen
         $string = preg_replace('/-{2,}/', '-', $string);
-        $string = preg_replace('/_{2,}/', '_', $string);
 
-        return $string;
+        return preg_replace('/_{2,}/', '_', $string);
     }
-    
+
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();
@@ -138,7 +135,7 @@ class Job extends DataObject
                 )->setShouldLazyLoad(true)->setCanCreate(false)->setTitleField("TagSortTitle")
             );
         }
-        
+
         $this->extend('updateJobCMSFields', $fields);
 
         return $fields;

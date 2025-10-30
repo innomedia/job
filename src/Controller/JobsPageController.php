@@ -2,23 +2,20 @@
 
 namespace Job;
 
-use SilverStripe\AssetAdmin\Forms\UploadField;
+use SilverStripe\Model\ArrayData;
+use SilverStripe\Model\List\ArrayList;
+use SilverStripe\Model\List\PaginatedList;
+use SilverStripe\Forms\Validation\RequiredFieldsValidator;
 use SilverStripe\Forms\EmailField;
 use SilverStripe\Forms\TextareaField;
 use SilverStripe\Forms\HiddenField;
 use SilverStripe\Forms\TextField;
-use SilverStripe\CMS\Controllers\ContentController;
 use PageController;
 use SilverStripe\Forms\Form;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\FormAction;
-use SilverStripe\Forms\RequiredFields;
 use SilverStripe\Control\Email\Email;
-use SilverStripe\Core\Injector\Injector;
 use HudhaifaS\Forms\FrontendFileField;
-use SilverStripe\View\ArrayData;
-use SilverStripe\ORM\ArrayList;
-use SilverStripe\ORM\PaginatedList;
 
 /**
  * Description
@@ -28,29 +25,29 @@ use SilverStripe\ORM\PaginatedList;
  */
 class JobsPageController extends PageController
 {
-    private static $allowed_actions = [
+    private static array $allowed_actions = [
         'BewerbungsForm',
         "PaginatedList",
         "job"
     ];
 
-    public function doInit()
+    public function doInit(): void
     {
         parent::doInit();
     }
 
     public function job() {
         $job = Job::get()->filter("URLSegment",$this->request->latestParam('ID'));
-        if(count($job) == 1) {
+        if(count($job) === 1) {
             $templateData = [
                 "Job" => $job->First(),
                 'BackLink' => (($this->request->getHeader('Referer')) ? $this->request->getHeader('Referer') : $this->Link()),
             ];
             $this->extend('updateJobTemplateData', $job, $templateData);
             return $this->customise(new ArrayData($templateData))->renderWith(["Job","Page"]);
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     public function PaginatedList()
@@ -75,6 +72,7 @@ class JobsPageController extends PageController
         if (array_key_exists("formsubmitted", $_REQUEST)) {
             return false;
         }
+        
         $form = Form::create(
             $this,
             "BewerbungsForm",
@@ -93,7 +91,7 @@ class JobsPageController extends PageController
                     ->setUseButtonTag(true)
                     ->addExtraClass('button orange_button')
             ),
-            RequiredFields::create('Vorname', 'Nachname', 'Email')
+            RequiredFieldsValidator::create('Vorname', 'Nachname', 'Email')
         );
         $field->setFolderName("bewerbungsfiles");
 
@@ -112,6 +110,7 @@ class JobsPageController extends PageController
         } else {
             $email->setTo('bk@tietge.com');
         }
+        
         $jobtitel = "";
         if ($data["Stelle"] == 0) {
             $jobtitel = "Initiativ Bewerbung";
@@ -124,7 +123,7 @@ class JobsPageController extends PageController
         }
 
         $email->setFrom($data['Email']);
-        $email->setSubject("[{$jobtitel}] Bewerbung von {$data["Vorname"]} {$data["Nachname"]}");
+        $email->setSubject(sprintf('[%s] Bewerbung von %s %s', $jobtitel, $data["Vorname"], $data["Nachname"]));
 
         $messageBody = "
           <p><strong>Name:</strong> {$data['Vorname']} {$data["Nachname"]}</p>
@@ -134,12 +133,14 @@ class JobsPageController extends PageController
           Bewirbt sich hiermit für die Stelle {$jobtitel}
         </p>";
         }
+        
         if ($data["Nachricht"] != "") {
             $messageBody .= "<h2>Nachricht</h2>
         <p>
           {$data["Nachricht"]}
         </p>";
-        };
+        }
+        ;
         $email->setBody($messageBody);
         if (array_key_exists("Anhang", $data)) {
             $email->addAttachment($data["Anhang"]["tmp_name"], $data["Anhang"]["name"], $data["Anhang"]["type"]);
