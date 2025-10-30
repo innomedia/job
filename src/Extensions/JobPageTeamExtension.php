@@ -1,11 +1,12 @@
 <?php
 namespace Job;
+
 use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\FieldList;
-use SilverStripe\ORM\DataExtension;
+use SilverStripe\Core\Extension;
 use Team\DataObjects\TeamMember;
 
-class JobPageTeamExtension extends DataExtension
+class JobPageTeamExtension extends Extension
 {
   /**
    * Database fields
