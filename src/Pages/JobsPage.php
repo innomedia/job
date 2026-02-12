@@ -62,7 +62,6 @@ class JobsPage extends Page
         ]);
 
         $fields->addFieldToTab('Root', Tab::create('Jobs', 'Stellenanzeigen'));
-        $fields->addFieldToTab('Root', Tab::create('Kategorie', 'Kategorien'));
 
         $fields->addFieldsToTab(
             'Root.Info',
@@ -112,6 +111,7 @@ class JobsPage extends Page
         }
 
         if (Config::inst()->get("JobModuleConfig")["CategoriesEnabled"] != "" && Config::inst()->get("JobModuleConfig")["CategoriesEnabled"] == true) {
+            $fields->addFieldToTab('Root', Tab::create('Kategorie', 'Kategorien'));
             $fields->addFieldToTab(
                 'Root.Kategorie',
                 GridField::create(
