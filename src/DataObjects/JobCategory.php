@@ -13,6 +13,9 @@ use SilverStripe\Forms\TextField;
  */
 class JobCategory extends DataObject
 {
+    private static $singular_name = 'Kategorie';
+    private static $plural_name = 'Kategorien';
+
     public function Link()
     {
         return $this->JobsPage()->Link() . "?cat=" . $this->ID;

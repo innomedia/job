@@ -17,7 +17,8 @@ use SilverStripe\Forms\HTMLEditor\HtmlEditorField;
  */
 class Job extends DataObject
 {
-
+    private static $singular_name = 'Stellenangebot';
+    private static $plural_name = 'Stellenangebote';
     private static string $table_name = 'Job';
 
     private static array $db = [

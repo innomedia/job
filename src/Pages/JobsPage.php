@@ -2,6 +2,7 @@
 
 namespace Job;
 
+use SilverStripe\Forms\Tab;
 use SilverStripe\Forms\TextField;
 use SilverStripe\AssetAdmin\Forms\UploadField;
 use SilverStripe\Forms\HTMLEditor\HtmlEditorField;
@@ -49,11 +50,20 @@ class JobsPage extends Page
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();
-        $fields->removeByName('WeitereLeistungen');
-        $fields->removeByName('AngeboteneLeistung');
-        $fields->removeByName('Gallerie');
-        $fields->removeByName('Icon');
-        $fields->removeByName('SecondContent');
+        $fields->removeByName([
+            'WeitereLeistungen',
+            'AngeboteneLeistung',
+            'Gallerie',
+            'Icon',
+            'SecondContent',
+            'Jobs',
+            'JobCircle',
+            'JobCategories',
+        ]);
+
+        $fields->addFieldToTab('Root', Tab::create('Jobs', 'Stellenanzeigen'));
+        $fields->addFieldToTab('Root', Tab::create('Kategorie', 'Kategorien'));
+
         $fields->addFieldsToTab(
             'Root.Info',
             [
